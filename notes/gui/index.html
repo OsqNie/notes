@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Task & Note Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="app-logo">
+                <span class="logo-icon">📝</span>
+                <span class="logo-text">Notes</span>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-item active" data-page="dashboard">Dashboard</button>
+                <button class="nav-item" data-page="tasks">Tasks</button>
+                <button class="nav-item" data-page="notes">Notes</button>
+                <button class="nav-item" data-page="projects">Projects</button>
+            </nav>
+        </div>
+        
+        <div class="header-center">
+            <div class="global-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="global-search-input" placeholder="Search everything..." />
+                <kbd class="search-shortcut" id="search-shortcut">Ctrl+K</kbd>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <button class="quick-action" onclick="showCreateTaskModal()" title="New Task">+ Task</button>
+            <button class="quick-action" onclick="showCreateNoteModal()" title="New Note">+ Note</button>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Dashboard -->
+        <div id="dashboard" class="page active">
+            <!-- Quick Stats Row -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number" id="due-today-count">0</div>
+                        <div class="stat-label">Due Today</div>
+                    </div>
+                    <div class="stat-icon urgent">⚡</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number" id="active-tasks-count">0</div>
+                        <div class="stat-label">Active Tasks</div>
+                    </div>
+                    <div class="stat-icon">✓</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number" id="projects-count">0</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                    <div class="stat-icon">📁</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number" id="notes-count">0</div>
+                        <div class="stat-label">Notes</div>
+                    </div>
+                    <div class="stat-icon">📝</div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="dashboard-grid">
+                <!-- Today's Tasks -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Today's Tasks</h3>
+                        <button class="section-action" onclick="showPage('tasks')">View All</button>
+                    </div>
+                    <div class="task-list-preview" id="today-tasks">
+                        <div class="loading">Loading tasks...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Recent Notes</h3>
+                        <button class="section-action" onclick="showPage('notes')">View All</button>
+                    </div>
+                    <div class="activity-feed" id="recent-notes">
+                        <div class="loading">Loading notes...</div>
+                    </div>
+                </div>
+
+                <!-- Project Progress -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h3>Project Progress</h3>
+                        <button class="section-action" onclick="showPage('projects')">View All</button>
+                    </div>
+                    <div class="progress-list" id="project-progress">
+                        <div class="loading">Loading projects...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Page -->
+        <div id="tasks" class="page">
+            <div class="page-toolbar">
+                <div class="toolbar-left">
+                    <h2>Tasks</h2>
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="list">List</button>
+                        <button class="view-btn" data-view="board">Board</button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-center">
+                    <div class="filter-chips">
+                        <button class="filter-chip active" data-filter="all">All <span class="count" id="all-count">0</span></button>
+                        <button class="filter-chip" data-filter="pending">Pending <span class="count" id="pending-count">0</span></button>
+                        <button class="filter-chip" data-filter="in-progress">In Progress <span class="count" id="progress-count">0</span></button>
+                        <button class="filter-chip" data-filter="completed">Completed <span class="count" id="completed-count">0</span></button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-right">
+                    <div class="sort-dropdown">
+                        <button class="sort-btn" id="sort-btn">Sort by Due Date ▼</button>
+                    </div>
+                    <button class="primary-btn" onclick="showCreateTaskModal()">+ New Task</button>
+                </div>
+            </div>
+
+            <div class="task-list" id="task-list">
+                <div class="loading">Loading tasks...</div>
+            </div>
+        </div>
+
+        <!-- Notes Page -->
+        <div id="notes" class="page">
+            <div class="page-toolbar">
+                <div class="toolbar-left">
+                    <h2>Notes</h2>
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="grid">Grid</button>
+                        <button class="view-btn" data-view="list">List</button>
+                    </div>
+                </div>
+                
+                <div class="toolbar-right">
+                    <button class="filter-btn">All Notes ▼</button>
+                    <button class="primary-btn" onclick="showCreateNoteModal()">+ New Note</button>
+                </div>
+            </div>
+
+            <div class="notes-grid" id="notes-grid">
+                <div class="loading">Loading notes...</div>
+            </div>
+        </div>
+
+        <!-- Projects Page -->
+        <div id="projects" class="page">
+            <div class="page-toolbar">
+                <h2>Projects</h2>
+                <button class="primary-btn" onclick="showCreateProjectModal()">+ New Project</button>
+            </div>
+
+            <div class="projects-grid" id="projects-grid">
+                <div class="loading">Loading projects...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Creation Modal -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal task-modal">
+            <div class="modal-header">
+                <h3>Create New Task</h3>
+                <button class="modal-close" onclick="hideModal('task-modal')">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="task-title" placeholder="What needs to be done?" autofocus>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <div class="priority-selector">
+                            <button class="priority-btn" data-priority="low">Low</button>
+                            <button class="priority-btn active" data-priority="medium">Medium</button>
+                            <button class="priority-btn" data-priority="high">High</button>
+                            <button class="priority-btn" data-priority="urgent">Urgent</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="task-due-date">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Project</label>
+                    <select id="task-project">
+                        <option value="">No Project</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="task-description" rows="3" placeholder="Add details..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tags</label>
+                    <input type="text" id="task-tags" placeholder="Comma-separated tags...">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-shortcuts">
+                    <kbd id="save-shortcut">Ctrl+S</kbd> Save • <kbd id="save-new-shortcut">Ctrl+Shift+S</kbd> Save & New
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" onclick="hideModal('task-modal')">Cancel</button>
+                    <button class="primary-btn" onclick="createTask()">Create Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Creation Modal -->
+    <div class="modal-overlay" id="note-modal">
+        <div class="modal note-modal">
+            <div class="modal-header">
+                <h3>Create New Note</h3>
+                <button class="modal-close" onclick="hideModal('note-modal')">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Note Title</label>
+                    <input type="text" id="note-title" placeholder="Note title..." autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="note-content" rows="8" placeholder="Start writing..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Project</label>
+                        <select id="note-project">
+                            <option value="">No Project</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <input type="text" id="note-tags" placeholder="Comma-separated tags...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-shortcuts">
+                    <kbd>Ctrl+S</kbd> Save • <kbd>Ctrl+Shift+S</kbd> Save & New
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" onclick="hideModal('note-modal')">Cancel</button>
+                    <button class="primary-btn" onclick="createNote()">Create Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Creation Modal -->
+    <div class="modal-overlay" id="project-modal">
+        <div class="modal project-modal">
+            <div class="modal-header">
+                <h3>Create New Project</h3>
+                <button class="modal-close" onclick="hideModal('project-modal')">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="project-name" placeholder="Project name..." autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="project-description" rows="3" placeholder="Project description..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="project-due-date">
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-shortcuts">
+                    <kbd>Ctrl+S</kbd> Save • <kbd>Ctrl+Shift+S</kbd> Save & New
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-btn" onclick="hideModal('project-modal')">Cancel</button>
+                    <button class="primary-btn" onclick="createProject()">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
